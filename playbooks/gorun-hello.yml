@@ -1,0 +1,16 @@
+---
+- name: Run hello world 
+  gather_facts: no
+  hosts: app
+  tasks:
+      - name: Run hello.go
+        command: go run "{{ filename }}"
+        environment:
+          PATH: '/usr/local/go/bin'
+        vars:
+          filename: /home/go/hello.go
+        register: hello_out
+
+      - name: Display go version
+        debug: 
+          msg: "{{ hello_out.stdout_lines }}"
