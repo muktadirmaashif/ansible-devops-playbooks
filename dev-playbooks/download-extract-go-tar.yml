@@ -1,6 +1,5 @@
 ---
 - name: Download and Extract Tar file
-  gather_facts: no
   hosts: app
   become: yes
   become_method: sudo

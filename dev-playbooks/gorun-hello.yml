@@ -1,6 +1,5 @@
 ---
 - name: Run hello world 
-  gather_facts: no
   hosts: app
   tasks:
       - name: Run hello.go
