@@ -3,7 +3,8 @@
   hosts: localhost
   vars:
     d_link: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz"
-    d_dest: "~/Downloads/"
+    d_dest: "{{ ansible_env.HOME }}/Downloads/"
+    init_path: "{{ playbook_dir | dirname }}"
     
   tasks: 
     - name: download nvim
@@ -58,7 +59,7 @@
 
         - name: place nvim config
           copy: 
-            src: "{{ ansible_env.HOME }}/init.vim"
+            src: "{{ init_path }}/init.vim"
             dest: "{{ ansible_env.HOME }}/.config/nvim/init.vim"
             remote_src: yes
           when: not init_vim.stat.exists
@@ -87,4 +88,5 @@
           debug: 
             msg: 
               - "Output: {{ version.stdout_lines }}"
+              - "directory: {{ playbook_dir | dirname }}"
 
