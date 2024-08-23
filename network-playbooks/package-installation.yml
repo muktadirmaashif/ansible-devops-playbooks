@@ -1,0 +1,15 @@
+---
+- name: Install Misc Packages
+  hosts: test
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Update
+      apt:
+        update_cache: yes
+        upgrade: yes
+      register: upgrade_output
+
+    - name: Display output
+      debug: 
+        msg: "{{ upgrade_output.stdout_lines | to_nice_json }}"

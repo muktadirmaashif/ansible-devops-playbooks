@@ -1,3 +1,7 @@
 [app]
 app1 ansible_host=192.168.100.11
 app2 ansible_host=192.168.100.12
+
+[test]
+192.168.100.15 ansible_connection=ssh ansible_user=vagrant
+
