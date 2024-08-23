@@ -1,0 +1,90 @@
+---
+- name: Download and Install Neovim
+  hosts: localhost
+  vars:
+    d_link: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz"
+    d_dest: "~/Downloads/"
+    
+  tasks: 
+    - name: download nvim
+      block: 
+        - name: Create Downloads directory
+          file:
+            path: "{{ d_dest }}"
+            state: directory
+            mode: '0755'
+            recurse: yes
+
+        - name: Download nvim tar file
+          get_url: 
+            url: "{{ d_link }}"
+            dest: "{{ d_dest }}"
+
+    - name: Install nvim
+      block: 
+        - name: Install tar
+          become: yes 
+          become_method: sudo 
+          apt: 
+            name: tar
+            state: present
+
+        - name: Extract nvim
+          unarchive:
+            src: "{{ d_dest }}/nvim-linux64.tar.gz"
+            dest: "{{ d_dest }}"
+            remote_src: yes
+
+
+    - name: set alias and nvim config 
+      block: 
+        - name: Set alias
+          lineinfile:
+            line: alias nv='nvim'
+            path: ~/.bashrc
+            state: present
+            insertafter: EOF
+
+        - name: Check if .config/nvim/init.vim exists
+          stat:
+            path: "{{ ansible_env.HOME }}/.config/nvim/init.vim"
+          register: init_vim
+
+        - name: create .config/nvim
+          file:
+            path: ~/.config/nvim
+            state: directory
+            recurse: yes
+
+        - name: place nvim config
+          copy: 
+            src: "{{ ansible_env.HOME }}/init.vim"
+            dest: "{{ ansible_env.HOME }}/.config/nvim/init.vim"
+            remote_src: yes
+          when: not init_vim.stat.exists
+
+        - name: export nvim path
+          lineinfile:
+            line: "export PATH=~/Downloads/nvim-linux64/bin:$PATH"
+            path: ~/.bashrc
+            state: present
+            insertafter: EOF
+        
+    - name: Display nvim version
+      block: 
+        - name: source .bashrc
+          shell: . ~/.bashrc
+          args:
+            executable: /bin/bash
+ 
+        - name: version command
+          shell: nvim --version
+          args:
+            executable: /bin/bash
+          register: version
+        
+        - name: display version
+          debug: 
+            msg: 
+              - "Output: {{ version.stdout_lines }}"
+
