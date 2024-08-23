@@ -1,10 +1,13 @@
 ---
 - name: Download and Install Neovim
-  hosts: localhost
+  hosts: lamp
   vars:
+    HOME: "{{ /home/vagrant }}"
     d_link: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz"
-    d_dest: "{{ ansible_env.HOME }}/Downloads/"
+    d_dest: "~/Downloads/"
     init_path: "{{ playbook_dir | dirname }}"
+    nvim_path: "~/Downloads/nvim-linux64/bin"
+    bash: "/bin/bash"
     
   tasks: 
     - name: download nvim
@@ -48,7 +51,7 @@
 
         - name: Check if .config/nvim/init.vim exists
           stat:
-            path: "{{ ansible_env.HOME }}/.config/nvim/init.vim"
+            path: "~/.config/nvim/init.vim"
           register: init_vim
 
         - name: create .config/nvim
@@ -60,8 +63,8 @@
         - name: place nvim config
           copy: 
             src: "{{ init_path }}/init.vim"
-            dest: "{{ ansible_env.HOME }}/.config/nvim/init.vim"
-            remote_src: yes
+            dest: "~/.config/nvim/init.vim"
+            # remote_src: yes
           when: not init_vim.stat.exists
 
         - name: export nvim path
@@ -70,23 +73,19 @@
             path: ~/.bashrc
             state: present
             insertafter: EOF
-        
+
     - name: Display nvim version
       block: 
-        - name: source .bashrc
-          shell: . ~/.bashrc
-          args:
-            executable: /bin/bash
- 
         - name: version command
           shell: nvim --version
           args:
-            executable: /bin/bash
+            executable: "{{ bash }}"
+          environment: 
+            PATH: "{{ nvim_path }}"
           register: version
-        
+ 
         - name: display version
           debug: 
             msg: 
-              - "Output: {{ version.stdout_lines }}"
-              - "directory: {{ playbook_dir | dirname }}"
+              - "{{ version.stdout_lines}}"
 
