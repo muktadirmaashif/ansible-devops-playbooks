@@ -37,6 +37,9 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 
+set listchars=space:· list
+highlight SpecialKey ctermfg=DarkGray guifg=DarkGray
+
 "
 " air-line
 let g:airline_theme='onedark'
