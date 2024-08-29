@@ -1,0 +1,21 @@
+- name: Configure Apache Web Server
+  gather_facts: false
+  hosts: vms
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Firewall permits access to httpd service
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: httpd enabled and running 
+      service: 
+        name: httpd
+        enabled: true
+        state: started
+
+

@@ -1,0 +1,43 @@
+- name: Set Index.html
+  #gather_facts: false
+  hosts: vms
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Test html page is installed
+      copy: 
+        content: "Welcome to HomePage of {{ ansible_hostname }}\n"
+        dest: /var/www/html/index.html
+
+
+- name: Test web server
+  gather_facts: false
+  hosts: localhost
+  become: no
+
+  tasks: 
+    - name: Connect to ansiman1 web server
+      uri: 
+        url: http://ansiman1.com 
+        return_content: yes
+        status_code: 200
+      register: test1var
+
+    - name: Display output
+      debug: 
+        msg: |
+          "Status: {{ test1var.msg }}
+           Content: {{ test1var.content }}"
+
+    - name: Connect to ansiman2 web server
+      uri: 
+        url: http://ansiman2.com 
+        return_content: yes
+        status_code: 200
+      register: test2var
+
+    - name: Display output
+      debug: 
+        msg: |
+          "Status: {{ test2var.msg }}
+           Content: {{ test2var.content }}"

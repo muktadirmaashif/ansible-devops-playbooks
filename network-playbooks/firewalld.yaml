@@ -1,0 +1,21 @@
+- name: check status firewalld
+  gather_facts: false
+  hosts: vms
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Check firewall status
+      service:
+        name: firewalld 
+        enabled: true
+      register: checkvar
+    - name: Display status
+      debug: 
+        #msg: "{{ checkvar }}"
+        msg: "Name: {{ name }} , State: {{ state }}, Enabled: {{ enabled }}"
+      vars: 
+        name: "{{ checkvar.name }}"
+        enabled: "{{ checkvar.enabled }}"
+        state: " {{ checkvar.status.ActiveState }}"
+
